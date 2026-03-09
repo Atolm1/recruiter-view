@@ -3,9 +3,16 @@ import { NextResponse } from 'next/server';
 export async function POST(request) {
   try {
     const data = await request.json();
-    // Your analysis logic goes here
-    return NextResponse.json({ message: "Analysis complete", data });
+    return NextResponse.json({ 
+      message: "API is working!", 
+      receivedData: data 
+    });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to analyze" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
   }
+}
+
+// Next.js needs this for the build to succeed if you have a POST route
+export async function GET() {
+  return NextResponse.json({ status: "API is online" });
 }
