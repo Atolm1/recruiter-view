@@ -1,2 +1,4 @@
-# recruiter-view
-Recruiter View Simulator
+node_modules/
+.next/
+.env
+.env.local
