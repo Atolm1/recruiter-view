@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const SYSTEM_PROMPT = `You are a senior technical recruiter. Scan the provided profile text and return ONLY valid JSON in this structure:
+const SYSTEM_PROMPT = `You are a senior technical recruiter. Analyze the profile and return ONLY valid JSON in this structure:
 {
   "firstImpression": "A 2-3 sentence gut reaction.",
   "clearElements": ["3-5 clear things"],
@@ -30,14 +30,17 @@ export async function POST(request) {
         model: 'claude-3-haiku-20240307',
         max_tokens: 1000,
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: 'Analyze this LinkedIn profile:\n\n' + profileText }],
+        messages: [{ role: 'user', content: 'Analyze this profile:\n\n' + profileText }],
       }),
     });
 
     const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    
     const text = data.content[0].text;
     return NextResponse.json(JSON.parse(text));
   } catch (err) {
+    console.error(err);
     return NextResponse.json({ error: 'Analysis failed' }, { status: 500 });
   }
 }
