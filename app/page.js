@@ -61,7 +61,16 @@ export default function Home() {
 
   const copyText = useCallback(async()=>{
     if(!result) return;
-    try{await navigator.clipboard.writeText(buildPlainText(result,dateStr));}catch{}
+    const text = buildPlainText(result,dateStr);
+    try{await navigator.clipboard.writeText(text);}catch{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
   },[result,dateStr]);
 
   return (
