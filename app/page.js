@@ -6,9 +6,57 @@ function buildPlainText(r, d) {
   return ['RECRUITER VIEW SIMULATOR — ANALYSIS REPORT','Generated: '+d,s,'','GRADE: '+r.overallGrade,r.oneLineSummary,'',s,'FIRST IMPRESSION',s,r.firstImpression,'',s,'WHAT READS CLEAR',s,...r.clearElements.map(e=>'  ✓ '+e),'',s,'WHAT FEELS CONFUSING',s,...r.confusingElements.map(e=>'  ? '+e),'',s,'PERCEIVED TARGET ROLE',s,r.perceivedTarget,'',s,'SKIP TRIGGERS',s,...r.skipTriggers.map(t=>'  ✕ '+t),'',s,'POSITIONING FIXES',s,...r.positioning.flatMap((p,i)=>['  '+(i+1)+'. ISSUE: '+p.issue,'     FIX:   '+p.fix,'']),s,'Powered by Recruiter View Simulator · danscareercorner.com'].join('\n');
 }
 
+function buildStyledReport(r, dateStr) {
+  const gc = ({A:'#22c55e','B+':'#22c55e',B:'#84cc16','B-':'#84cc16','C+':'#eab308',C:'#eab308','C-':'#eab308',D:'#f97316',F:'#ef4444'})[r.overallGrade] || '#6b7280';
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Recruiter View — Analysis Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e17;color:#e5e7eb;font-family:'DM Sans',sans-serif;padding:48px;max-width:820px;margin:0 auto}
+.card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:20px 24px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-family:'Space Mono',monospace;margin-bottom:12px}
+.tag{display:inline-block;padding:5px 12px;border-radius:7px;font-size:12px;margin:3px 4px 3px 0}
+.tg{background:#052e16;color:#86efac}.to{background:#431407;color:#fdba74}
+.two-col{display:flex;gap:16px;margin-bottom:16px}.two-col>div{flex:1}
+.fix-grid{display:flex;gap:12px;margin-bottom:14px}.fix-grid>div{flex:1;background:#0d1117;border-radius:8px;padding:12px 16px}
+.fi{border-left:3px solid #ef4444}.fs{border-left:3px solid #22c55e}
+.fl{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;margin-bottom:6px;font-family:'Space Mono',monospace}
+.ft{font-size:12px;line-height:1.6;color:#d1d5db}
+.trigger-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.6;color:#d1d5db;margin-bottom:6px}
+.trigger-x{color:#ef4444;font-family:'Space Mono',monospace;font-size:11px;margin-top:3px}
+@media print{body{padding:24px;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.no-print{display:none!important}}
+</style></head><body>
+<div class="no-print" style="text-align:right;margin-bottom:20px">
+<button onclick="window.print()" style="padding:10px 24px;border-radius:8px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#0a0e17;font-weight:700;font-family:'Space Mono',monospace;font-size:13px;cursor:pointer">🖨 PRINT / SAVE AS PDF</button></div>
+<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">
+<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:22px">👁</div>
+<div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#f9fafb">Recruiter View</div></div>
+<div style="font-size:12px;color:#6b7280;font-family:'Space Mono',monospace;margin-bottom:28px;padding-left:54px">Analysis Report · ${esc(dateStr)}</div>
+<div class="card" style="display:flex;align-items:center;gap:20px;border-radius:14px;padding:22px 24px;margin-bottom:20px">
+<div style="width:72px;height:72px;border-radius:50%;border:4px solid ${gc};display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:${gc};background:${gc}11;flex-shrink:0">${esc(r.overallGrade)}</div>
+<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#6b7280;font-family:'Space Mono',monospace;margin-bottom:4px">Recruiter Readiness</div>
+<div style="font-size:16px;font-weight:700;color:#f9fafb;font-family:'Playfair Display',serif;line-height:1.4">${esc(r.oneLineSummary)}</div></div></div>
+<div class="card"><div class="card-title" style="color:#f59e0b">💭 First Impression</div>
+<div style="font-size:14px;line-height:1.7;color:#d1d5db;font-style:italic">"${esc(r.firstImpression)}"</div></div>
+<div class="two-col"><div class="card"><div class="card-title" style="color:#22c55e">✅ What Reads Clear</div>
+${r.clearElements.map(e=>'<span class="tag tg">'+esc(e)+'</span>').join('')}</div>
+<div class="card"><div class="card-title" style="color:#f97316">❓ What Feels Confusing</div>
+${r.confusingElements.map(e=>'<span class="tag to">'+esc(e)+'</span>').join('')}</div></div>
+<div class="card"><div class="card-title" style="color:#8b5cf6">🎯 Perceived Target Role</div>
+<div style="font-size:14px;line-height:1.7;color:#d1d5db">${esc(r.perceivedTarget)}</div></div>
+<div class="card"><div class="card-title" style="color:#ef4444">⏭ Skip Triggers</div>
+${r.skipTriggers.map(t=>'<div class="trigger-row"><span class="trigger-x">✕</span>'+esc(t)+'</div>').join('')}</div>
+<div class="card"><div class="card-title" style="color:#06b6d4">🔧 Sharpen Your Positioning</div>
+${r.positioning.map(p=>'<div class="fix-grid"><div class="fi"><div class="fl">Issue</div><div class="ft">'+esc(p.issue)+'</div></div><div class="fs"><div class="fl">Fix</div><div class="ft">'+esc(p.fix)+'</div></div></div>').join('')}</div>
+<div style="text-align:center;font-size:11px;color:#4b5563;font-family:'Space Mono',monospace;padding-top:12px;border-top:1px solid #1f2937;margin-top:8px">Powered by Recruiter View Simulator · danscareercorner.com</div>
+</body></html>`;
+}
+
 const GradeRing = ({ grade, size = 88 }) => {
-  const colors = { A:'#22c55e',B:'#84cc16',C:'#eab308',D:'#f97316',F:'#ef4444' };
-  const color = colors[grade?.[0]] || '#6b7280';
+  const colors = {A:'#22c55e','B+':'#22c55e',B:'#84cc16','B-':'#84cc16','C+':'#eab308',C:'#eab308','C-':'#eab308',D:'#f97316',F:'#ef4444'};
+  const color = colors[grade] || '#6b7280';
   return (<div style={{ width:size,height:size,borderRadius:'50%',border:'4px solid '+color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Space Mono',monospace",fontSize:size*0.4,fontWeight:700,color,background:color+'11',flexShrink:0 }}>{grade||'—'}</div>);
 };
 
@@ -43,9 +91,12 @@ export default function Home() {
     setLoading(true); setError(''); setResult(null); setElapsed(0); startTimer();
     try {
       const res = await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profileText})});
-      if(!res.ok) throw new Error('fail');
+      if(!res.ok) {
+        const data = await res.json().catch(()=>({}));
+        throw new Error(data.error || 'Analysis failed');
+      }
       setResult(await res.json());
-    } catch(e){ setError('Analysis failed. Please try again.'); }
+    } catch(e){ setError(e.message || 'Analysis failed. Please try again.'); }
     finally { stopTimer(); setLoading(false); }
   };
 
@@ -71,6 +122,12 @@ export default function Home() {
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
+  },[result,dateStr]);
+
+  const savePdf = useCallback(()=>{
+    if(!result) return;
+    const w = window.open('','_blank');
+    if(w){ w.document.write(buildStyledReport(result,dateStr)); w.document.close(); }
   },[result,dateStr]);
 
   return (
@@ -132,6 +189,7 @@ export default function Home() {
               <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
                 <ActionBtn onClick={downloadText} icon="📄" label="Download TXT" feedback="Downloaded!"/>
                 <ActionBtn onClick={copyText} icon="📋" label="Copy Text" feedback="Copied!"/>
+                <ActionBtn onClick={savePdf} icon="📑" label="Save as PDF" variant="primary"/>
               </div>
               <button onClick={reset} style={{padding:'10px 24px',borderRadius:10,border:'1px solid #374151',background:'transparent',color:'#d1d5db',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:"'Space Mono',monospace",letterSpacing:'0.04em',textTransform:'uppercase',transition:'all 0.2s'}}>Scan Another Profile</button>
             </div>
