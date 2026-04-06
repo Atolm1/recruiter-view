@@ -1,6 +1,22 @@
 import { NextResponse } from 'next/server';
 
+let dailyCount = 0;
+let lastReset = new Date().toDateString();
+const DAILY_LIMIT = 50;
+
 export async function POST(request) {
+  const today = new Date().toDateString();
+  if (today !== lastReset) {
+    dailyCount = 0;
+    lastReset = today;
+  }
+
+  if (dailyCount >= DAILY_LIMIT) {
+    return NextResponse.json({
+      error: 'Daily scan limit reached. This free tool resets every 24 hours — check back tomorrow!'
+    }, { status: 429 });
+  }
+
   try {
     const { profileText } = await request.json();
     if (!profileText) {
@@ -37,6 +53,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid response format' }, { status: 500 });
     }
     text = text.substring(start, end + 1);
+    dailyCount++;
     return NextResponse.json(JSON.parse(text));
   } catch (err) {
     console.error('Error:', err.message);
