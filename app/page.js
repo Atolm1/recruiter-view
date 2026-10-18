@@ -3,14 +3,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 function buildPlainText(r, d) {
   const s = '────────────────────────────────────────────────────';
-  return ['RECRUITER VIEW SIMULATOR — ANALYSIS REPORT','Generated: '+d,s,'','GRADE: '+r.overallGrade,r.oneLineSummary,'',s,'FIRST IMPRESSION',s,r.firstImpression,'',s,'WHAT READS CLEAR',s,...r.clearElements.map(e=>'  ✓ '+e),'',s,'WHAT FEELS CONFUSING',s,...r.confusingElements.map(e=>'  ? '+e),'',s,'PERCEIVED TARGET ROLE',s,r.perceivedTarget,'',s,'SKIP TRIGGERS',s,...r.skipTriggers.map(t=>'  ✕ '+t),'',s,'POSITIONING FIXES',s,...r.positioning.flatMap((p,i)=>['  '+(i+1)+'. ISSUE: '+p.issue,'     FIX:   '+p.fix,'']),s,'Powered by Recruiter View Simulator · danscareercorner.com'].join('\n');
+  return ['RECRUITER VIEW SIMULATOR: ANALYSIS REPORT','Generated: '+d,s,'','GRADE: '+r.overallGrade,r.oneLineSummary,'',s,'FIRST IMPRESSION',s,r.firstImpression,'',s,'WHAT READS CLEAR',s,...r.clearElements.map(e=>'  ✓ '+e),'',s,'WHAT FEELS CONFUSING',s,...r.confusingElements.map(e=>'  ? '+e),'',s,'PERCEIVED TARGET ROLE',s,r.perceivedTarget,'',s,'SKIP TRIGGERS',s,...r.skipTriggers.map(t=>'  ✕ '+t),'',s,'POSITIONING FIXES',s,...r.positioning.flatMap((p,i)=>['  '+(i+1)+'. ISSUE: '+p.issue,'     FIX:   '+p.fix,'']),s,'Powered by Recruiter View Simulator · danscareercorner.com'].join('\n');
 }
 
 function buildStyledReport(r, dateStr) {
   const gc = ({A:'#22c55e','B+':'#22c55e',B:'#84cc16','B-':'#84cc16','C+':'#eab308',C:'#eab308','C-':'#eab308',D:'#f97316',F:'#ef4444'})[r.overallGrade] || '#6b7280';
   const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Recruiter View — Analysis Report</title>
+<title>Recruiter View: Analysis Report</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -57,7 +57,7 @@ ${r.positioning.map(p=>'<div class="fix-grid"><div class="fi"><div class="fl">Is
 const GradeRing = ({ grade, size = 88 }) => {
   const colors = {A:'#22c55e','B+':'#22c55e',B:'#84cc16','B-':'#84cc16','C+':'#eab308',C:'#eab308','C-':'#eab308',D:'#f97316',F:'#ef4444'};
   const color = colors[grade] || '#6b7280';
-  return (<div style={{ width:size,height:size,borderRadius:'50%',border:'4px solid '+color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Space Mono',monospace",fontSize:size*0.4,fontWeight:700,color,background:color+'11',flexShrink:0 }}>{grade||'—'}</div>);
+  return (<div style={{ width:size,height:size,borderRadius:'50%',border:'4px solid '+color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Space Mono',monospace",fontSize:size*0.4,fontWeight:700,color,background:color+'11',flexShrink:0 }}>{grade||'?'}</div>);
 };
 
 const SectionCard = ({ icon, title, children, accent = '#f59e0b', delay = 0 }) => {
