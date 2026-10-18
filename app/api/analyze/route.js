@@ -51,8 +51,11 @@ export async function POST(request) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1500,
+        model: 'claude-sonnet-5-5',
+        // Sonnet 5.5 can think briefly before it answers, and that thinking
+        // counts toward max_tokens, so leave room for it plus the JSON.
+        max_tokens: 8000,
+        output_config: { effort: 'medium' },
         messages: [{
           role: 'user',
           content: `You are a sharp, experienced senior recruiter who has screened thousands of LinkedIn profiles. You are about to simulate a real 10-20 second recruiter scan for someone who asked for honest feedback.
@@ -96,7 +99,18 @@ ${profileText}`
       return NextResponse.json({ error: 'API error: ' + res.status }, { status: 502 });
     }
     const data = await res.json();
-    let text = data.content[0].text;
+    if (data.stop_reason === 'refusal') {
+      console.error('Refusal:', JSON.stringify(data.stop_details));
+      return NextResponse.json({
+        error: 'This scan could not be completed. Try pasting only your headline, About section, and experience.'
+      }, { status: 422 });
+    }
+    if (data.stop_reason === 'max_tokens') {
+      console.error('Response cut off at max_tokens');
+      return NextResponse.json({ error: 'The scan ran long and was cut off. Please try again.' }, { status: 502 });
+    }
+    // The reply can begin with a thinking block, so read the text blocks by type.
+    let text = data.content.filter((block) => block.type === 'text').map((block) => block.text).join('');
     text = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
     const start = text.indexOf('{');
     const end = text.lastIndexOf('}');
